@@ -17,7 +17,7 @@ class MiniBlogApplcation extends Application
 	protected function configure()
 	{
 		$this->db_manager->connect('master', [
-			'dns' => 'mysql:dbname=mini_blog;host=localhost',
+			'dsn' => 'mysql:dbname=mini_blog;host=localhost',
 			'user' => 'shimazaki',
 			'password' => 'Gurasefu1!',
 		]);
