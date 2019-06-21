@@ -13,7 +13,7 @@ abstract class Controller
 
 	public function __construct($application)
 	{
-		$this->controller->name = strtolower(substr(get_class($this), 0, -10));
+		$this->controller_name = strtolower(substr(get_class($this), 0, -10));
 
 		$this->application = $application;
 		$this->request = $application->getRequest();
@@ -65,7 +65,7 @@ abstract class Controller
 		}
 
 		$path = $this->controller_name . '/' . $template;
-		return $view->render($path, $variables, $layouta);
+		return $view->render($path, $variables, $layout);
 	}
 
 	protected function forward404()
@@ -75,7 +75,7 @@ abstract class Controller
 
 	protected function redirect($url)
 	{
-		if(!preg_match('#http?://#', $url)) {
+		if(!preg_match('#https?://#', $url)) {
 			$protocol = $this->request->isSsl() ? 'https://' : 'http://';
 			$host = $this-request->getHost();
 			$base_url = $this->request->getBaseUrl();
@@ -104,7 +104,7 @@ abstract class Controller
 
 	protected function checkCsrfToken($form_name, $token)
 	{
-		$key = 'cfrf_tokens/' . $form_name;
+		$key = 'csrf_tokens/' . $form_name;
 		$tokens = $this->session->get($key, []);
 
 		if(false !== ($pos = array_search($token, $tokens, true))) {

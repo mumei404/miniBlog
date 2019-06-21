@@ -28,7 +28,7 @@ class Session
 
 	public function remove($name)
 	{
-		unset($_SESSIPN[$name]);
+		unset($_SESSION[$name]);
 	}
 
 	public function clear()
@@ -36,7 +36,7 @@ class Session
 		$_SESSION = [];
 	}
 
-	public function regenerate($destory = true)
+	public function regenerate($destroy = true)
 	{
 		if(!self::$sessionIdRegenerated) {
 			session_regenerate_id($destroy);

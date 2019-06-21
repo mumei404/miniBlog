@@ -6,9 +6,9 @@ class DbManager
 	protected $repository_connection_map = [];
 	protected $repositories = [];
 
-	public function __destract()
+	public function __destruct()
 	{
-		foreach($this->reoisitories as $repository) {
+		foreach($this->repositories as $repository) {
 			unset($repository);
 		}
 
@@ -20,14 +20,14 @@ class DbManager
 	public function connect($name, $params)
 	{
 		$params = array_merge([
-			'dns' => null,
+			'dsn' => null,
 			'user' => '',
 			'password' => '',
 			'options' => [],
 		], $params);
 
 		$con = new PDO(
-			$params['dns'],
+			$params['dsn'],
 			$params['user'],
 			$params['password'],
 			$params['options'],
@@ -64,10 +64,10 @@ class DbManager
 	public function get($repository_name)
 	{
 		if(!isset($this->repositories[$repository_name])) {
-			$repository_class = $repository?name . "Repository";
+			$repository_class = $repository_name . "Repository";
 			$con = $this->getConnectionForRepository($repository_name);
 			$repository = new $repository_class($con);
-			$this->reposiories[$repository_name] = $repository;
+			$this->repositories[$repository_name] = $repository;
 		}
 		return $this->repositories[$repository_name];
 	}

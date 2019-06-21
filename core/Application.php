@@ -8,6 +8,7 @@ abstract class Application
 	protected $session;
 	protected $db_manager;
 	protected $login_action = [];
+	protected $router;
 
 	public function __construct($debug = false)
 	{
@@ -47,7 +48,7 @@ abstract class Application
 
 	public function isDebugMode()
 	{
-		return $this->debug();
+		return $this->debug;
 	}
 
 	public function getRequest()
@@ -93,15 +94,15 @@ abstract class Application
 	public function run()
 	{
 		try {
-			$params = $this->router->resplve($this->request->getPathInfo());
+			$params = $this->router->resolve($this->request->getPathInfo());
 			if($params === false) {
-				throw new HttpNotFoundException('No route found for ', $this->request->getPathInfo());
+				throw new HttpNotFoundException('No route found for ' .  $this->request->getPathInfo());
 			}
 
-			$controller = $param['controller'];
-			$action = $param['action'];
+			$controller = $params['controller'];
+			$action = $params['action'];
 
-			$this->runAction($controller, $actin, $params);
+			$this->runAction($controller, $action, $params);
 		} catch(HttpNotFoundException $e) {
 			$this->render404Page($e);
 		} catch(UnauthorizedActionException $e) {
@@ -114,8 +115,8 @@ abstract class Application
 	public function runAction($controller_name, $action, $params = [])
 	{
 		$controller_class = ucfirst($controller_name) . 'Controller';
-		$controller = $this->findCOntroller($controller_class);
-		if($controller === flase) {
+		$controller = $this->findController($controller_class);
+		if($controller === false) {
 			throw new HttpNotFoundException($controller_class . ' controller is not found.');
 		}
 
@@ -123,10 +124,10 @@ abstract class Application
 		$this->response->setContent($content);
 	}
 
-	protected function findCOntroller($controller_class)
+	protected function findController($controller_class)
 	{
 		if(!class_exists($controller_class)) {
-			$controller_file = $this->getControllerFir() . '/' . $controller_class . '.php';
+			$controller_file = $this->getControllerDir() . '/' . $controller_class . '.php';
 			if(!is_readable($controller_file)) {
 				return false;
 			} else {
@@ -143,7 +144,7 @@ abstract class Application
 	protected function render404Page($e)
 	{
 		$this->response->setStatusCode(404, 'Not Found');
-		$message = $this->isDebugMode() ? $e->getMassage() : 'Page not found.';
+		$message = $this->isDebugMode() ? $e->getMessage() : 'Page not found.';
 		$message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
 
 		$this->response->setContent(<<<EOF
